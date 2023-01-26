@@ -1,14 +1,14 @@
 package com.jigi.jdbc.service;
 
 import com.jigi.jdbc.domain.Member;
-import com.jigi.jdbc.repository.MemberRepositoryV1;
-import com.jigi.jdbc.repository.MemberRepositoryV2;
+import com.jigi.jdbc.repository.MemberRepositoryV3;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import java.sql.SQLException;
@@ -16,21 +16,25 @@ import java.sql.SQLException;
 import static com.jigi.jdbc.connection.ConnectionConst.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * 트랜잭션 매니저 사용
+ */
 @Slf4j
-class MemberServiceV2Test {
+class MemberServiceV3_1Test {
 
     public static final String MemberA = "memberA";
     public static final String MemberB = "memberB";
     public static final String MemberEX = "ex";
 
-    private MemberServiceV2 memberService;
-    private MemberRepositoryV2 memberRepository;
+    private MemberServiceV3_1 memberService;
+    private MemberRepositoryV3 memberRepository;
 
     @BeforeEach
     void setUp() throws SQLException {
         DriverManagerDataSource dataSource = new DriverManagerDataSource(URL, USERNAME, PASSWORD);
-        memberRepository = new MemberRepositoryV2(dataSource);
-        memberService = new MemberServiceV2(dataSource, memberRepository);
+        memberRepository = new MemberRepositoryV3(dataSource);
+        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource);
+        memberService = new MemberServiceV3_1(transactionManager, memberRepository);
 
         memberRepository.delete(MemberA);
         memberRepository.delete(MemberB);
