@@ -1,27 +1,27 @@
 package com.jigi.jdbc.repository;
 
 import com.jigi.jdbc.domain.Member;
-import com.jigi.jdbc.exception.MyDBException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLExceptionTranslator;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.NoSuchElementException;
 
 /**
- * 예외 누수 문제 해결
- * 체크 예외를 런타임 예외로 변경
- * MemberRepository 사용
- * throws SQLException 제거
+ * SQLExceptionTranslator 추가
  */
 @Slf4j
 public class MemberRepositoryV4_2 implements MemberRepository {
     private final DataSource dataSource;
+    private final SQLExceptionTranslator translator;
 
     public MemberRepositoryV4_2(DataSource dataSource) {
         this.dataSource = dataSource;
+        this.translator = new SQLErrorCodeSQLExceptionTranslator(dataSource);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class MemberRepositoryV4_2 implements MemberRepository {
             int count = pstmt.executeUpdate();
             return member;
         } catch (SQLException e) {
-            throw new MyDBException("DB Exception", e);
+            throw translator.translate("member save", sql, e);
         } finally {
             close(conn, pstmt, null);
         }
@@ -66,7 +66,7 @@ public class MemberRepositoryV4_2 implements MemberRepository {
             }
 
         } catch (SQLException e) {
-            throw new MyDBException("DB Exception", e);
+            throw translator.translate("member findById", sql, e);
         } finally {
             close(conn, pstmt, rs);
         }
@@ -87,7 +87,7 @@ public class MemberRepositoryV4_2 implements MemberRepository {
             int count = pstmt.executeUpdate();
             log.info("update count = {}", count);
         } catch (SQLException e) {
-            throw new MyDBException("DB Exception", e);
+            throw translator.translate("member update", sql, e);
         } finally {
             close(conn, pstmt, null);
         }
@@ -107,7 +107,7 @@ public class MemberRepositoryV4_2 implements MemberRepository {
             int count = pstmt.executeUpdate();
             log.info("update count = {}", count);
         } catch (SQLException e) {
-            throw new MyDBException("DB Exception", e);
+            throw translator.translate("member delete", sql, e);
         } finally {
             close(conn, pstmt, null);
         }

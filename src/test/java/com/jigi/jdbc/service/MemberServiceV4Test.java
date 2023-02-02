@@ -2,7 +2,7 @@ package com.jigi.jdbc.service;
 
 import com.jigi.jdbc.domain.Member;
 import com.jigi.jdbc.repository.MemberRepository;
-import com.jigi.jdbc.repository.MemberRepositoryV4_1;
+import com.jigi.jdbc.repository.MemberRepositoryV5;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +42,9 @@ class MemberServiceV4Test {
 
         @Bean
         MemberRepository memberRepository() {
-            return new MemberRepositoryV4_1(dataSource);
+//            return new MemberRepositoryV4_1(dataSource);
+//            return new MemberRepositoryV4_2(dataSource);
+            return new MemberRepositoryV5(dataSource);
         }
 
         @Bean
